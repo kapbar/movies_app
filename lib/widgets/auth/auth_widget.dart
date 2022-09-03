@@ -83,6 +83,7 @@ class __FormWidgetState extends State<_FormWidget> {
     final password = _passwordTextController.text;
     if (login == 'admin' && password == 'admin') {
       errorText = null;
+      Navigator.of(context).pushNamed('main_screen');
     } else {
       errorText = 'Не верный логин или пароль';
     }
@@ -114,7 +115,7 @@ class __FormWidgetState extends State<_FormWidget> {
               fontSize: 17,
               color: Colors.red,
             ),
-          ), 
+          ),
           const SizedBox(height: 20),
         ],
         const Text(
