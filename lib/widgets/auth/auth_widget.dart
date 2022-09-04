@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:movies_app/theme/app_button_style.dart';
+import 'package:movies_app/theme/app_colors.dart';
 
 class AuthWidget extends StatefulWidget {
   const AuthWidget({super.key});
@@ -14,6 +15,7 @@ class _AuthWidgetState extends State<AuthWidget> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Login to your account'),
+        centerTitle: true,
       ),
       body: ListView(
         children: const [
@@ -36,6 +38,7 @@ class _HeaderWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 25),
           const _FormWidget(),
@@ -74,8 +77,8 @@ class _FormWidget extends StatefulWidget {
 }
 
 class __FormWidgetState extends State<_FormWidget> {
-  final _loginTextController = TextEditingController();
-  final _passwordTextController = TextEditingController();
+  final _loginTextController = TextEditingController(text: 'admin');
+  final _passwordTextController = TextEditingController(text: 'admin');
   String? errorText;
 
   void _auth() {
@@ -83,7 +86,7 @@ class __FormWidgetState extends State<_FormWidget> {
     final password = _passwordTextController.text;
     if (login == 'admin' && password == 'admin') {
       errorText = null;
-      Navigator.of(context).pushNamed('main_screen');
+      Navigator.of(context).pushReplacementNamed('/main_screen');
     } else {
       errorText = 'Не верный логин или пароль';
     }
@@ -100,9 +103,20 @@ class __FormWidgetState extends State<_FormWidget> {
     );
     const color = Color(0xff01B4E4);
     const textFieldDecoration = InputDecoration(
-      border: OutlineInputBorder(),
+      enabledBorder: OutlineInputBorder(
+        borderSide: BorderSide(
+          style: BorderStyle.solid,
+          color: AppColors.mainLightBlue,
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(
+          style: BorderStyle.solid,
+          color: AppColors.mainLightBlue,
+        ),
+      ),
       isCollapsed: true,
-      contentPadding: EdgeInsets.all(10.0),
+      contentPadding: EdgeInsets.all(12.0),
     );
     final errorText = this.errorText;
     return Column(
