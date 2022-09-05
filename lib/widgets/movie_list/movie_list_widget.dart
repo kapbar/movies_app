@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
 class Movie {
+  final int id;
   final String imageName;
   final String title;
   final String time;
   final String description;
 
   const Movie({
+    required this.id,
     required this.imageName,
     required this.title,
     required this.time,
@@ -24,42 +26,49 @@ class MovieListWidget extends StatefulWidget {
 class _MovieListWidgetState extends State<MovieListWidget> {
   static const _movies = <Movie>[
     Movie(
+      id: 1,
       imageName: 'imageName',
       title: 'Quen and King',
       time: ' April 7, 2022',
       description: 'If you signed up but did not get your verification email.',
     ),
     Movie(
+      id: 2,
       imageName: 'imageName',
       title: 'Шахматы',
       time: ' April 7, 2022',
       description: 'If you signed up but did not get your verification email.',
     ),
     Movie(
+      id: 3,
       imageName: 'imageName',
       title: 'Королева',
       time: ' April 7, 2022',
       description: 'If you signed up but did not get your verification email.',
     ),
     Movie(
+      id: 4,
       imageName: 'imageName',
       title: 'Флаттер',
       time: ' April 7, 2022',
       description: 'If you signed up but did not get your verification email.',
     ),
     Movie(
+      id: 5,
       imageName: 'imageName',
       title: 'Дарт язык',
       time: ' April 7, 2022',
       description: 'If you signed up but did not get your verification email.',
     ),
     Movie(
+      id: 6,
       imageName: 'imageName',
       title: 'OPP Solid',
       time: ' April 7, 2022',
       description: 'If you signed up but did not get your verification email.',
     ),
     Movie(
+      id: 7,
       imageName: 'imageName',
       title: 'Anime 22',
       time: ' April 7, 2022',
@@ -90,7 +99,13 @@ class _MovieListWidgetState extends State<MovieListWidget> {
     _searchController.addListener(_searchMovie);
   }
 
-  void _onMovieTap(int index) {}
+  void _onMovieTap(int index) {
+    final id = _movies[index].id;
+    Navigator.of(context).pushNamed(
+      '/main_screen/movie_details',
+      arguments: id,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -163,7 +178,7 @@ class _MovieListWidgetState extends State<MovieListWidget> {
                     color: Colors.transparent,
                     child: InkWell(
                       borderRadius: BorderRadius.circular(10.0),
-                      onTap: () =>_onMovieTap(index),
+                      onTap: () => _onMovieTap(index),
                     ),
                   ),
                 ],

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:movies_app/widgets/movie_details/main_info_widget.dart';
 
 class MovieDetailsWidget extends StatefulWidget {
-  const MovieDetailsWidget({super.key});
+  final int movieId;
+  const MovieDetailsWidget({super.key, required this.movieId});
 
   @override
   State<MovieDetailsWidget> createState() => _MovieDetailsWidgetState();
@@ -10,6 +12,19 @@ class MovieDetailsWidget extends StatefulWidget {
 class _MovieDetailsWidgetState extends State<MovieDetailsWidget> {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('TMDB'),
+        centerTitle: true,
+      ),
+      body: ColoredBox(
+        color: const Color.fromRGBO(24, 23, 27, 1.0),
+        child: ListView(
+          children: const [
+            MainInfoWidget(),
+          ],
+        ),
+      ),
+    );
   }
 }
