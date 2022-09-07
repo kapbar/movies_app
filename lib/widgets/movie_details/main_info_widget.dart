@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:movies_app/widgets/elements/radial_percent_widget.dart';
 
 class MainInfoWidget extends StatelessWidget {
   const MainInfoWidget({super.key});
@@ -10,6 +11,7 @@ class MainInfoWidget extends StatelessWidget {
       children: const [
         TopPosterWidget(),
         MovieNameWidget(),
+        ScoreWidget(),
         SummeryWidget(),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
@@ -89,6 +91,54 @@ class MovieNameWidget extends StatelessWidget {
   }
 }
 
+class ScoreWidget extends StatelessWidget {
+  const ScoreWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        TextButton(
+          onPressed: () {},
+          child: Row(
+            children: const [
+              SizedBox(
+                width: 55,
+                height: 55,
+                child: RadialPercentWidget(
+                  percent: 0.72,
+                  fillColor: Color.fromARGB(255, 10, 23, 25),
+                  lineColor: Color.fromARGB(255, 37, 203, 103),
+                  freeColor: Color.fromARGB(255, 25, 54, 31),
+                  lineWidth: 3.5,
+                  child: Text(
+                    '72%',
+                    style: TextStyle(color: Colors.white, fontSize: 13),
+                  ),
+                ),
+              ),
+              SizedBox(width: 5),
+              Text('User Score'),
+            ],
+          ),
+        ),
+        Container(width: 1, height: 20, color: Colors.grey),
+        TextButton(
+          onPressed: () {},
+          child: Row(
+            children: const [
+              Icon(Icons.play_arrow, color: Colors.white),
+              SizedBox(width: 5),
+              Text('Play Trailer'),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class SummeryWidget extends StatelessWidget {
   const SummeryWidget({super.key});
 
@@ -121,51 +171,74 @@ class TableWidget extends StatelessWidget {
     const nameStyle = TextStyle(
       color: Colors.white,
       fontSize: 17,
-      fontWeight: FontWeight.w400,
+      fontWeight: FontWeight.bold,
     );
     const jobTitleStyle = TextStyle(
       color: Colors.white,
-      fontSize: 17,
+      fontSize: 14,
       fontWeight: FontWeight.w400,
     );
     return Column(
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text('Stefano Sollima', style: nameStyle),
-                Text('Director', style: jobTitleStyle),
-              ],
+            Expanded(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text('Stefano Sollima', style: nameStyle),
+                    Text('Director', style: jobTitleStyle),
+                  ],
+                ),
+              ),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text('Stefano Sollima', style: nameStyle),
-                Text('Director', style: jobTitleStyle),
-              ],
+            Expanded(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text('Stefano Sollima', style: nameStyle),
+                    Text('Director', style: jobTitleStyle),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
-        const SizedBox(height: 20),
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text('Stefano Sollima', style: nameStyle),
-                Text('Director', style: jobTitleStyle),
-              ],
+            Expanded(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text('Stefano Sollima', style: nameStyle),
+                    Text('Director', style: jobTitleStyle),
+                  ],
+                ),
+              ),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text('Stefano Sollima', style: nameStyle),
-                Text('Director', style: jobTitleStyle),
-              ],
+            Expanded(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text('Stefano Sollima', style: nameStyle),
+                    Text('Director', style: jobTitleStyle),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
