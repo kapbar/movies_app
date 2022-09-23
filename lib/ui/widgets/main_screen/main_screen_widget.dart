@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:movies_app/widgets/movie_list/movie_list_widget.dart';
+import 'package:movies_app/domain/data_providers/session_data_providers.dart';
+import 'package:movies_app/ui/widgets/movie_list/movie_list_widget.dart';
+import 'package:movies_app/ui/widgets/news/news_screen.dart';
+import 'package:movies_app/ui/widgets/tv_show/tv_show_screen.dart';
 
 class MainScreenWidget extends StatefulWidget {
   const MainScreenWidget({super.key});
@@ -24,11 +27,19 @@ class _MainScreenWidgetState extends State<MainScreenWidget> {
       appBar: AppBar(
         title: const Text('TMDB'),
         centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () => SessionDataProvider().setSessionId(null),
+            icon: const Icon(Icons.logout),
+          ),
+        ],
       ),
       body: IndexedStack(
         index: _selectedTab,
         children: const [
           MovieListWidget(),
+          NewsScreen(),
+          TvShowScreen(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -36,11 +47,11 @@ class _MainScreenWidgetState extends State<MainScreenWidget> {
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'Новости',
+            label: 'Фильмы',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.movie_filter),
-            label: 'Фильмы',
+            label: 'Новости',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.tv),
