@@ -3,8 +3,7 @@ import 'package:movies_app/ui/widgets/movie_details/main_info_widget.dart';
 import 'package:movies_app/ui/widgets/movie_details/screen_cast_widget.dart';
 
 class MovieDetailsWidget extends StatefulWidget {
-  final int movieId;
-  const MovieDetailsWidget({super.key, required this.movieId});
+  const MovieDetailsWidget({super.key});
 
   @override
   State<MovieDetailsWidget> createState() => _MovieDetailsWidgetState();
