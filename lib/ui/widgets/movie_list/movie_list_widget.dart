@@ -1,124 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:movies_app/ui/navigation/main_navigation.dart';
+import 'package:movies_app/domain/api_client/api_client.dart';
+import 'package:movies_app/library/widgets/inherited/provider.dart';
+import 'package:movies_app/ui/widgets/movie_list/movie_list_model.dart';
 
-class Movie {
-  final int id;
-  final String imageName;
-  final String title;
-  final String time;
-  final String description;
-
-  const Movie({
-    required this.id,
-    required this.imageName,
-    required this.title,
-    required this.time,
-    required this.description,
-  });
-}
-
-class MovieListWidget extends StatefulWidget {
+class MovieListWidget extends StatelessWidget {
   const MovieListWidget({super.key});
 
   @override
-  State<MovieListWidget> createState() => _MovieListWidgetState();
-}
-
-class _MovieListWidgetState extends State<MovieListWidget> {
-  static const _movies = <Movie>[
-    Movie(
-      id: 1,
-      imageName: 'imageName',
-      title: 'Quen and King',
-      time: ' April 7, 2022',
-      description: 'If you signed up but did not get your verification email.',
-    ),
-    Movie(
-      id: 2,
-      imageName: 'imageName',
-      title: 'Шахматы',
-      time: ' April 7, 2022',
-      description: 'If you signed up but did not get your verification email.',
-    ),
-    Movie(
-      id: 3,
-      imageName: 'imageName',
-      title: 'Королева',
-      time: ' April 7, 2022',
-      description: 'If you signed up but did not get your verification email.',
-    ),
-    Movie(
-      id: 4,
-      imageName: 'imageName',
-      title: 'Флаттер',
-      time: ' April 7, 2022',
-      description: 'If you signed up but did not get your verification email.',
-    ),
-    Movie(
-      id: 5,
-      imageName: 'imageName',
-      title: 'Дарт язык',
-      time: ' April 7, 2022',
-      description: 'If you signed up but did not get your verification email.',
-    ),
-    Movie(
-      id: 6,
-      imageName: 'imageName',
-      title: 'OPP Solid',
-      time: ' April 7, 2022',
-      description: 'If you signed up but did not get your verification email.',
-    ),
-    Movie(
-      id: 7,
-      imageName: 'imageName',
-      title: 'Anime 22',
-      time: ' April 7, 2022',
-      description: 'If you signed up but did not get your verification email.',
-    ),
-  ];
-
-  var _filteredMovie = <Movie>[];
-
-  final _searchController = TextEditingController();
-
-  void _searchMovie() {
-    final query = _searchController.text;
-    if (query.isNotEmpty) {
-      _filteredMovie = _movies.where((Movie movie) {
-        return movie.title.toLowerCase().contains(query.toLowerCase());
-      }).toList();
-    } else {
-      _filteredMovie = _movies;
-    }
-    setState(() {});
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _filteredMovie = _movies;
-    _searchController.addListener(_searchMovie);
-  }
-
-  void _onMovieTap(int index) {
-    final id = _movies[index].id;
-    Navigator.of(context).pushNamed(
-      MainNavigationRouteName.movieDetails,
-      arguments: id,
-    );
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final model = NotifierProvider.watch<MovieListModel>(context);
+    if (model == null) return const SizedBox.shrink();
     return Stack(
       children: [
         ListView.builder(
           padding: const EdgeInsets.only(top: 70.0),
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          itemCount: _filteredMovie.length,
+          itemCount: model.movies.length,
           itemExtent: 163,
           itemBuilder: (BuildContext context, int index) {
-            final movie = _movies[index];
+            final movie = model.movies[index];
+            final posterPath = movie.posterPath;
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               child: Stack(
@@ -139,9 +40,10 @@ class _MovieListWidgetState extends State<MovieListWidget> {
                     clipBehavior: Clip.hardEdge,
                     child: Row(
                       children: [
-                        const Placeholder(
-                          fallbackWidth: 120,
-                        ),
+                        posterPath != null
+                            ? Image.network(ApiClient.imageUrl(posterPath),
+                                width: 95)
+                            : const SizedBox.shrink(),
                         const SizedBox(width: 15),
                         Expanded(
                           child: Column(
@@ -157,14 +59,14 @@ class _MovieListWidgetState extends State<MovieListWidget> {
                               ),
                               const SizedBox(height: 5),
                               Text(
-                                movie.time,
+                                model.stringFromDate(movie.releaseDate),
                                 style: const TextStyle(color: Colors.grey),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                               const SizedBox(height: 20),
                               Text(
-                                movie.description,
+                                movie.overview,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -179,7 +81,7 @@ class _MovieListWidgetState extends State<MovieListWidget> {
                     color: Colors.transparent,
                     child: InkWell(
                       borderRadius: BorderRadius.circular(10.0),
-                      onTap: () => _onMovieTap(index),
+                      onTap: () => model.onMovieTap(context, index),
                     ),
                   ),
                 ],
@@ -190,7 +92,6 @@ class _MovieListWidgetState extends State<MovieListWidget> {
         Padding(
           padding: const EdgeInsets.all(10.0),
           child: TextField(
-            controller: _searchController,
             decoration: InputDecoration(
               hintText: 'Поиск',
               filled: true,
