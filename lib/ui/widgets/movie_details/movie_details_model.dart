@@ -6,7 +6,7 @@ import 'package:movies_app/domain/entity/movie_details.dart';
 class MovieDetailsModel extends ChangeNotifier {
   final _apiClient = ApiClient();
   final int movieId;
-  late String _locale;
+  String _locale = '';
   MovieDetails? _movieDetails;
   late DateFormat _dateFormat;
 
@@ -14,8 +14,8 @@ class MovieDetailsModel extends ChangeNotifier {
 
   MovieDetails? get movieDetails => _movieDetails;
 
-  // String stringFromDate(DateTime? date) =>
-  //     date != null ? _dateFormat.format(date) : '';
+  String stringFromDate(DateTime? date) =>
+      date != null ? _dateFormat.format(date) : '';
 
   Future<void> setupLocale(BuildContext context) async {
     final locale = Localizations.localeOf(context).toLanguageTag();

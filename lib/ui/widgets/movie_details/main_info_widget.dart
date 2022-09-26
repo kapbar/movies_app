@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:movies_app/domain/api_client/api_client.dart';
+import 'package:movies_app/library/widgets/inherited/provider.dart';
 import 'package:movies_app/ui/widgets/elements/radial_percent_widget.dart';
+import 'package:movies_app/ui/widgets/movie_details/movie_details_model.dart';
 
 class MainInfoWidget extends StatelessWidget {
   const MainInfoWidget({super.key});
@@ -23,19 +27,31 @@ class MainInfoWidget extends StatelessWidget {
             ),
           ),
         ),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0),
-          child: Text(
-            'TopPosterWidget extends StatelessWidget Overview Widget build(BuildContext context. TopPosterWidget extends StatelessWidget Overview Widget build(BuildContext context Overview Widget build(BuildContext context)',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.white,
-            ),
-          ),
-        ),
+        DescriptionWidget(),
         SizedBox(height: 30),
         TableWidget(),
       ],
+    );
+  }
+}
+
+class DescriptionWidget extends StatelessWidget {
+  const DescriptionWidget({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final model = NotifierProvider.watch<MovieDetailsModel>(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Text(
+        model?.movieDetails?.overview ?? '',
+        style: const TextStyle(
+          fontSize: 16,
+          color: Colors.white,
+        ),
+      ),
     );
   }
 }
@@ -45,16 +61,26 @@ class TopPosterWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: const [
-        Placeholder(fallbackHeight: 220),
-        Positioned(
-          top: 20,
-          left: 20,
-          bottom: 20,
-          child: Placeholder(fallbackHeight: 180, fallbackWidth: 120),
-        ),
-      ],
+    final model = NotifierProvider.watch<MovieDetailsModel>(context);
+    final backdropPath = model?.movieDetails?.backdropPath;
+    final posterPath = model?.movieDetails?.posterPath;
+    return AspectRatio(
+      aspectRatio: 16 / 9,
+      child: Stack(
+        children: [
+          backdropPath != null
+              ? Image.network(ApiClient.imageUrl(backdropPath))
+              : const SizedBox.shrink(),
+          Positioned(
+            top: 20,
+            left: 20,
+            bottom: 20,
+            child: posterPath != null
+                ? Image.network(ApiClient.imageUrl(posterPath))
+                : const SizedBox.shrink(),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -64,24 +90,27 @@ class MovieNameWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final model = NotifierProvider.watch<MovieDetailsModel>(context);
+    var year = model?.movieDetails?.releaseDate?.year.toString();
+    year = year != null ? ' ($year)' : '';
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Center(
         child: RichText(
           textAlign: TextAlign.center,
           maxLines: 3,
-          text: const TextSpan(
+          text: TextSpan(
             children: [
               TextSpan(
-                text: 'Tom Clancy Without Remorse',
-                style: TextStyle(
+                text: model?.movieDetails?.title ?? '',
+                style: const TextStyle(
                   fontSize: 21,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               TextSpan(
-                text: ' (2022)',
-                style: TextStyle(fontSize: 16),
+                text: year,
+                style: const TextStyle(fontSize: 16),
               ),
             ],
           ),
@@ -96,30 +125,34 @@ class ScoreWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final voteAverage = NotifierProvider.watch<MovieDetailsModel>(context)
+            ?.movieDetails
+            ?.voteAverage ??
+        0;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         TextButton(
           onPressed: () {},
           child: Row(
-            children: const [
+            children: [
               SizedBox(
                 width: 55,
                 height: 55,
                 child: RadialPercentWidget(
-                  percent: 0.72,
-                  fillColor: Color.fromARGB(255, 10, 23, 25),
-                  lineColor: Color.fromARGB(255, 37, 203, 103),
-                  freeColor: Color.fromARGB(255, 25, 54, 31),
+                  percent: voteAverage / 10,
+                  fillColor: const Color.fromARGB(255, 10, 23, 25),
+                  lineColor: const Color.fromARGB(255, 37, 203, 103),
+                  freeColor: const Color.fromARGB(255, 25, 54, 31),
                   lineWidth: 3.5,
                   child: Text(
-                    '72%',
-                    style: TextStyle(color: Colors.white, fontSize: 13),
+                    '${(voteAverage * 10).toStringAsFixed(0)}%',
+                    style: const TextStyle(color: Colors.white, fontSize: 13),
                   ),
                 ),
               ),
-              SizedBox(width: 5),
-              Text('User Score'),
+              const SizedBox(width: 5),
+              const Text('User Score'),
             ],
           ),
         ),
@@ -144,15 +177,41 @@ class SummeryWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ColoredBox(
-      color: Color.fromARGB(255, 16, 13, 26),
+    final model = NotifierProvider.watch<MovieDetailsModel>(context);
+    if (model == null) return const SizedBox.shrink();
+    var text = <String>[];
+    final releaseDate = model.movieDetails?.releaseDate;
+    if (releaseDate != null) {
+      text.add(model.stringFromDate(releaseDate));
+    }
+    final productionCountries = model.movieDetails?.productionCountries;
+    if (productionCountries != null && productionCountries.isNotEmpty) {
+      text.add('(${productionCountries.first.iso})');
+    }
+    final runtime = model.movieDetails?.runtime ?? 0;
+    final miliseconds = runtime * 60000;
+    final runtimeDate = DateTime.fromMillisecondsSinceEpoch(miliseconds);
+    text.add(DateFormat.Hm().format(runtimeDate));
+
+    final genres = model.movieDetails?.genres;
+    if (genres != null && genres.isNotEmpty) {
+      var genresNames = <String>[];
+      for (var genr in genres) {
+        genresNames.add(genr.name);
+      }
+
+      text.add(genresNames.join(', '));
+    }
+
+    return ColoredBox(
+      color: const Color.fromARGB(255, 16, 13, 26),
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 70),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 70),
         child: Text(
-          'R, 04/29/2022 (US) Action, Adventure, Thriller, War',
+          text.join(' '),
           textAlign: TextAlign.center,
           maxLines: 3,
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.white,
             fontSize: 17,
             fontWeight: FontWeight.w400,

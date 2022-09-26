@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:movies_app/library/widgets/inherited/provider.dart';
 import 'package:movies_app/ui/widgets/auth/auth_model.dart';
 import 'package:movies_app/ui/widgets/auth/auth_widget.dart';
+import 'package:movies_app/ui/widgets/main_screen/main_screen_model.dart';
 import 'package:movies_app/ui/widgets/main_screen/main_screen_widget.dart';
 import 'package:movies_app/ui/widgets/movie_details/movie_details_model.dart';
 import 'package:movies_app/ui/widgets/movie_details/movie_details_widget.dart';
@@ -18,10 +19,13 @@ class MainNavigation {
       : MainNavigationRouteName.auth;
   final routes = <String, Widget Function(BuildContext)>{
     MainNavigationRouteName.auth: (context) => NotifierProvider(
-          model: AuthModel(),
+          create: () => AuthModel(),
           child: const AuthWidget(),
         ),
-    MainNavigationRouteName.mainScreen: (context) => const MainScreenWidget(),
+    MainNavigationRouteName.mainScreen: (context) => NotifierProvider(
+          create: () => MainScreenModel(),
+          child: const MainScreenWidget(),
+        ),
   };
   Route<Object> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -30,7 +34,7 @@ class MainNavigation {
         final movieId = arguments is int ? arguments : 0;
         return MaterialPageRoute(
           builder: (context) => NotifierProvider(
-            model: MovieDetailsModel(movieId),
+            create: () => MovieDetailsModel(movieId),
             child: const MovieDetailsWidget(),
           ),
         );
