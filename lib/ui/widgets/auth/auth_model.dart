@@ -15,7 +15,6 @@ class AuthModel extends ChangeNotifier {
   bool _isAuthProgress = false;
   bool get canStartAuth => !_isAuthProgress;
   bool get isAuthProgress => _isAuthProgress;
-  String? sessionId;
 
   Future<void> auth(BuildContext context, [bool mounted = true]) async {
     final login = loginTextController.text;
@@ -29,12 +28,15 @@ class AuthModel extends ChangeNotifier {
     _errorMessage = null;
     _isAuthProgress = true;
     notifyListeners();
+    String? sessionId;
+    int? accountId;
 
     try {
       sessionId = await _apiClient.auth(
         username: login,
         password: password,
       );
+      accountId = await _apiClient.getAccountInfo(sessionId);
     } on ApiClientException catch (error) {
       switch (error.type) {
         case ApiClientExceptionType.network:
@@ -56,13 +58,15 @@ class AuthModel extends ChangeNotifier {
       return;
     }
 
-    if (sessionId == null) {
+    if (sessionId == null || accountId == null) {
       _errorMessage = 'PPFPFPFPF{} ошибка!!!!!';
       notifyListeners();
       return;
     }
-    
+
     await _sessionDataProvider.setSessionId(sessionId);
+    await _sessionDataProvider.setAccountId(accountId);
+
     if (!mounted) return;
     Navigator.of(context)
         .pushReplacementNamed(MainNavigationRouteName.mainScreen);

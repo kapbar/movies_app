@@ -6,6 +6,19 @@ import 'package:movies_app/domain/entity/popular_movie_response.dart';
 
 enum ApiClientExceptionType { network, auth, other }
 
+enum MediaType { movie, tv }
+
+extension MediaTypeAsString on MediaType {
+  String asString() {
+    switch (this) {
+      case MediaType.movie:
+        return 'movie';
+      case MediaType.tv:
+        return 'tv';
+    }
+  }
+}
+
 class ApiClientException implements Exception {
   final ApiClientExceptionType type;
 
@@ -106,6 +119,24 @@ class ApiClient {
     return result;
   }
 
+  Future<int> getAccountInfo(String sessionId) async {
+    parser(dynamic json) {
+      final jsonMap = json as Map<String, dynamic>;
+      final response = jsonMap['id'] as int;
+      return response;
+    }
+
+    final result = _get(
+      '/account',
+      parser,
+      {
+        'api_key': _apiKey,
+        'session_id': sessionId,
+      },
+    );
+    return result;
+  }
+
   Future<PopularMovieResponse> popularMovie(int page, String locale) async {
     parser(dynamic json) {
       final jsonMap = json as Map<String, dynamic>;
@@ -164,6 +195,54 @@ class ApiClient {
         'append_to_response': 'credits,videos',
         'api_key': _apiKey,
         'language': locale,
+      },
+    );
+    return result;
+  }
+
+  Future<bool> isFavorite(int movieId, String sessionId) async {
+    parser(dynamic json) {
+      final jsonMap = json as Map<String, dynamic>;
+      final response = jsonMap['favorite'] as bool;
+      return response;
+    }
+
+    final result = _get(
+      '/movie/$movieId/account_states',
+      parser,
+      {
+        'api_key': _apiKey,
+        'session_id': sessionId,
+      },
+    );
+    return result;
+  }
+
+  Future<String> markAsFavorite({
+    required int accountId,
+    required String sessionId,
+    required MediaType mediaType,
+    required int mediaId,
+    required bool isFavorite,
+  }) async {
+    final parameters = <String, dynamic>{
+      'media_type': mediaType.asString(),
+      'media_id': mediaId.toString(),
+      "favorite": isFavorite.toString(),
+    };
+    parser(dynamic json) {
+      final jsonMap = json as Map<String, dynamic>;
+      final token = jsonMap["request_token"] as String;
+      return token;
+    }
+
+    final result = _post(
+      '/account/$accountId/favorite',
+      parser,
+      parameters,
+      {
+        'api_key': _apiKey,
+        'session_id': sessionId,
       },
     );
     return result;

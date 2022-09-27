@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:movies_app/domain/api_client/api_client.dart';
 import 'package:movies_app/domain/entity/movie_details_casts.dart';
 import 'package:movies_app/library/widgets/inherited/provider.dart';
+import 'package:movies_app/ui/navigation/main_navigation.dart';
 import 'package:movies_app/ui/widgets/elements/radial_percent_widget.dart';
 import 'package:movies_app/ui/widgets/movie_details/movie_details_model.dart';
 
@@ -80,6 +81,16 @@ class TopPosterWidget extends StatelessWidget {
                 ? Image.network(ApiClient.imageUrl(posterPath))
                 : const SizedBox.shrink(),
           ),
+          Positioned(
+            top: 5,
+            right: 5,
+            child: IconButton(
+              onPressed: () => model?.toggleFavorite(),
+              icon: Icon(model?.isFavorite == true
+                  ? Icons.favorite
+                  : Icons.favorite_outline_outlined),
+            ),
+          ),
         ],
       ),
     );
@@ -126,10 +137,13 @@ class ScoreWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final voteAverage = NotifierProvider.watch<MovieDetailsModel>(context)
-            ?.movieDetails
-            ?.voteAverage ??
-        0;
+    final movieDetails =
+        NotifierProvider.watch<MovieDetailsModel>(context)?.movieDetails;
+    final voteAverage = movieDetails?.voteAverage ?? 0;
+    final videos = movieDetails?.videos.results
+        .where((video) => video.type == 'Trailer' && video.site == 'YouTube');
+    final trailerKey = videos?.isNotEmpty == true ? videos?.first.key : null;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -158,16 +172,21 @@ class ScoreWidget extends StatelessWidget {
           ),
         ),
         Container(width: 1, height: 20, color: Colors.grey),
-        TextButton(
-          onPressed: () {},
-          child: Row(
-            children: const [
-              Icon(Icons.play_arrow, color: Colors.white),
-              SizedBox(width: 5),
-              Text('Play Trailer'),
-            ],
-          ),
-        ),
+        trailerKey != null
+            ? TextButton(
+                onPressed: () => Navigator.of(context).pushNamed(
+                  MainNavigationRouteName.movieTrailer,
+                  arguments: trailerKey,
+                ),
+                child: Row(
+                  children: const [
+                    Icon(Icons.play_arrow, color: Colors.white),
+                    SizedBox(width: 5),
+                    Text('Play Trailer'),
+                  ],
+                ),
+              )
+            : const SizedBox.shrink(),
       ],
     );
   }
