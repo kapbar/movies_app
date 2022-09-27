@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:movies_app/domain/api_client/api_client.dart';
+import 'package:movies_app/domain/entity/movie_details_casts.dart';
 import 'package:movies_app/library/widgets/inherited/provider.dart';
 import 'package:movies_app/ui/widgets/elements/radial_percent_widget.dart';
 import 'package:movies_app/ui/widgets/movie_details/movie_details_model.dart';
@@ -205,18 +206,25 @@ class SummeryWidget extends StatelessWidget {
 
     return ColoredBox(
       color: const Color.fromARGB(255, 16, 13, 26),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 70),
-        child: Text(
-          text.join(' '),
-          textAlign: TextAlign.center,
-          maxLines: 3,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 17,
-            fontWeight: FontWeight.w400,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              child: Text(
+                text.join(' '),
+                textAlign: TextAlign.center,
+                maxLines: 3,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -237,6 +245,16 @@ class TableWidget extends StatelessWidget {
       fontSize: 14,
       fontWeight: FontWeight.w400,
     );
+    final model = NotifierProvider.watch<MovieDetailsModel>(context);
+    var crew = model?.movieDetails?.credits.crew;
+    if (crew == null || crew.isEmpty) return const SizedBox.shrink();
+    crew = crew.length > 4 ? crew.sublist(0, 4) : crew;
+    var crewChunks = <List<Employee>>[];
+    for (var i = 0; i < crew.length; i += 2) {
+      crewChunks.add(
+        crew.sublist(i, i + 2 > crew.length ? crew.length : i + 2),
+      );
+    }
     return Column(
       children: [
         Row(
@@ -248,9 +266,9 @@ class TableWidget extends StatelessWidget {
                     const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text('Stefano Sollima', style: nameStyle),
-                    Text('Director', style: jobTitleStyle),
+                  children: [
+                    Text(crewChunks.first.first.name, style: nameStyle),
+                    Text(crewChunks.first.first.job, style: jobTitleStyle),
                   ],
                 ),
               ),
@@ -261,9 +279,9 @@ class TableWidget extends StatelessWidget {
                     const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text('Stefano Sollima', style: nameStyle),
-                    Text('Director', style: jobTitleStyle),
+                  children: [
+                    Text(crewChunks.first.first.name, style: nameStyle),
+                    Text(crewChunks.first.first.job, style: jobTitleStyle),
                   ],
                 ),
               ),
@@ -279,9 +297,9 @@ class TableWidget extends StatelessWidget {
                     const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text('Stefano Sollima', style: nameStyle),
-                    Text('Director', style: jobTitleStyle),
+                  children: [
+                    Text(crewChunks.last.last.name, style: nameStyle),
+                    Text(crewChunks.last.last.job, style: jobTitleStyle),
                   ],
                 ),
               ),
@@ -292,9 +310,9 @@ class TableWidget extends StatelessWidget {
                     const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text('Stefano Sollima', style: nameStyle),
-                    Text('Director', style: jobTitleStyle),
+                  children: [
+                    Text(crewChunks.last.last.name, style: nameStyle),
+                    Text(crewChunks.last.last.job, style: jobTitleStyle),
                   ],
                 ),
               ),

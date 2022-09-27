@@ -62,7 +62,7 @@ class ApiClient {
       throw ApiClientException(ApiClientExceptionType.network);
     } on ApiClientException {
       rethrow;
-    } catch (_) {
+    } catch (e) {
       throw ApiClientException(ApiClientExceptionType.other);
     }
   }
@@ -86,9 +86,7 @@ class ApiClient {
       return result;
     } on SocketException {
       throw ApiClientException(ApiClientExceptionType.network);
-    } on ApiClientException {
-      rethrow;
-    } catch (_) {
+    } catch (error) {
       throw ApiClientException(ApiClientExceptionType.other);
     }
   }
@@ -163,6 +161,7 @@ class ApiClient {
       '/movie/$movieId',
       parser,
       {
+        'append_to_response': 'credits,videos',
         'api_key': _apiKey,
         'language': locale,
       },

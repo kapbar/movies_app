@@ -15,6 +15,7 @@ class AuthModel extends ChangeNotifier {
   bool _isAuthProgress = false;
   bool get canStartAuth => !_isAuthProgress;
   bool get isAuthProgress => _isAuthProgress;
+  String? sessionId;
 
   Future<void> auth(BuildContext context, [bool mounted = true]) async {
     final login = loginTextController.text;
@@ -28,14 +29,14 @@ class AuthModel extends ChangeNotifier {
     _errorMessage = null;
     _isAuthProgress = true;
     notifyListeners();
-    String? sessionId;
+
     try {
       sessionId = await _apiClient.auth(
         username: login,
         password: password,
       );
-    } on ApiClientException catch (e) {
-      switch (e.type) {
+    } on ApiClientException catch (error) {
+      switch (error.type) {
         case ApiClientExceptionType.network:
           _errorMessage = 'Сервер не доступен. Проверьте инет';
           break;
@@ -46,17 +47,21 @@ class AuthModel extends ChangeNotifier {
           _errorMessage = 'Произашла ошибка. Повторите еще раз';
           break;
       }
+    } catch (e) {
+      _errorMessage = '111111111';
     }
     _isAuthProgress = false;
     if (_errorMessage != null) {
       notifyListeners();
       return;
     }
+
     if (sessionId == null) {
       _errorMessage = 'PPFPFPFPF{} ошибка!!!!!';
       notifyListeners();
       return;
     }
+    
     await _sessionDataProvider.setSessionId(sessionId);
     if (!mounted) return;
     Navigator.of(context)

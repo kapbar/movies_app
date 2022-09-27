@@ -1,6 +1,4 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
-
 import 'package:movies_app/library/widgets/inherited/provider.dart';
 import 'package:movies_app/ui/widgets/movie_details/main_info_widget.dart';
 import 'package:movies_app/ui/widgets/movie_details/movie_details_model.dart';

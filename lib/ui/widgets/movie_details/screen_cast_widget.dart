@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:movies_app/domain/api_client/api_client.dart';
+import 'package:movies_app/library/widgets/inherited/provider.dart';
+import 'package:movies_app/ui/widgets/movie_details/movie_details_model.dart';
 
 class ScreenCastWidget extends StatelessWidget {
   const ScreenCastWidget({super.key});
@@ -20,71 +23,10 @@ class ScreenCastWidget extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 380,
             child: Scrollbar(
-              child: ListView.builder(
-                itemCount: 20,
-                itemExtent: 140,
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (BuildContext context, int index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(
-                          color: Colors.black.withOpacity(0.2),
-                        ),
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(10)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: ClipRRect(
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(10)),
-                        clipBehavior: Clip.hardEdge,
-                        child: Column(
-                          children: [
-                            const Placeholder(
-                              fallbackWidth: 140,
-                              fallbackHeight: 160,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: const [
-                                  Text(
-                                    'Steven Yuen',
-                                    maxLines: 1,
-                                  ),
-                                  SizedBox(height: 7),
-                                  Text(
-                                    'Steven Yuen const BorderRadius scrollDirection: Axis.horizontal',
-                                    maxLines: 4,
-                                  ),
-                                  SizedBox(height: 5),
-                                  Text(
-                                    '8 Episodes',
-                                    maxLines: 1,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
+              child: ActorsListWidget(),
             ),
           ),
           Padding(
@@ -95,6 +37,91 @@ class ScreenCastWidget extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class ActorsListWidget extends StatelessWidget {
+  const ActorsListWidget({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final model = NotifierProvider.watch<MovieDetailsModel>(context);
+    var cast = model?.movieDetails?.credits.cast;
+    if (cast == null || cast.isEmpty) return const SizedBox.shrink();
+    return ListView.builder(
+      itemCount: cast.length,
+      itemExtent: 140,
+      scrollDirection: Axis.horizontal,
+      itemBuilder: (BuildContext context, int index) {
+        return ActorListItem(index: index);
+      },
+    );
+  }
+}
+
+class ActorListItem extends StatelessWidget {
+  final int index;
+  const ActorListItem({Key? key, required this.index}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final model = NotifierProvider.read<MovieDetailsModel>(context);
+    final actor = model!.movieDetails!.credits.cast[index];
+    final profilePath = actor.profilePath;
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(
+            color: Colors.black.withOpacity(0.2),
+          ),
+          borderRadius: const BorderRadius.all(Radius.circular(10)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.all(Radius.circular(10)),
+          clipBehavior: Clip.hardEdge,
+          child: Column(
+            children: [
+              profilePath != null
+                  ? Image.network(ApiClient.imageUrl(profilePath))
+                  : const SizedBox.shrink(),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      actor.name,
+                      maxLines: 1,
+                    ),
+                    const SizedBox(height: 7),
+                    Text(
+                      actor.character,
+                      maxLines: 4,
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      '${actor.castId} Episodes',
+                      maxLines: 1,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
