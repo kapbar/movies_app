@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:movies_app/domain/api_client/api_client.dart';
@@ -12,6 +14,8 @@ class MovieDetailsModel extends ChangeNotifier {
   MovieDetails? _movieDetails;
   late DateFormat _dateFormat;
   bool _isFavorite = false;
+
+  Future<void>? Function()? onSessionExpired;
 
   MovieDetailsModel(this.movieId);
 
@@ -30,12 +34,22 @@ class MovieDetailsModel extends ChangeNotifier {
   }
 
   Future<void> loadDetails() async {
-    _movieDetails = await _apiClient.movieDetails(movieId, _locale);
-    final sessionId = await _sessionDataProvider.getSessionId();
-    if (sessionId != null) {
-      _isFavorite = await _apiClient.isFavorite(movieId, sessionId);
+    try {
+      _movieDetails = await _apiClient.movieDetails(movieId, _locale);
+      final sessionId = await _sessionDataProvider.getSessionId();
+      if (sessionId != null) {
+        _isFavorite = await _apiClient.isFavorite(movieId, sessionId);
+      }
+      notifyListeners();
+    } on ApiClientException catch (e) {
+      switch (e.type) {
+        case ApiClientExceptionType.sessionExpired:
+          await onSessionExpired?.call();
+          break;
+        default:
+          print(e);
+      }
     }
-    notifyListeners();
   }
 
   Future<void> toggleFavorite() async {
@@ -43,15 +57,24 @@ class MovieDetailsModel extends ChangeNotifier {
     final accountId = await _sessionDataProvider.getAccountId();
     if (sessionId == null || accountId == null) return;
 
-    final newFavoriteValue = !_isFavorite;
-    _isFavorite = newFavoriteValue;
+    _isFavorite = !_isFavorite;
     notifyListeners();
-    await _apiClient.markAsFavorite(
-      accountId: accountId,
-      sessionId: sessionId,
-      mediaType: MediaType.movie,
-      mediaId: movieId,
-      isFavorite: newFavoriteValue,
-    );
+    try {
+      await _apiClient.markAsFavorite(
+        accountId: accountId,
+        sessionId: sessionId,
+        mediaType: MediaType.movie,
+        mediaId: movieId,
+        isFavorite: _isFavorite,
+      );
+    } on ApiClientException catch (e) {
+      switch (e.type) {
+        case ApiClientExceptionType.sessionExpired:
+          await onSessionExpired?.call();
+          break;
+        default:
+          print(e);
+      }
+    }
   }
 }

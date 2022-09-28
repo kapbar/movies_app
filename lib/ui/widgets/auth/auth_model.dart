@@ -37,8 +37,8 @@ class AuthModel extends ChangeNotifier {
         password: password,
       );
       accountId = await _apiClient.getAccountInfo(sessionId);
-    } on ApiClientException catch (error) {
-      switch (error.type) {
+    } on ApiClientException catch (e) {
+      switch (e.type) {
         case ApiClientExceptionType.network:
           _errorMessage = 'Сервер не доступен. Проверьте инет';
           break;
@@ -48,9 +48,9 @@ class AuthModel extends ChangeNotifier {
         case ApiClientExceptionType.other:
           _errorMessage = 'Произашла ошибка. Повторите еще раз';
           break;
+        default:
+          break;
       }
-    } catch (e) {
-      _errorMessage = '111111111';
     }
     _isAuthProgress = false;
     if (_errorMessage != null) {

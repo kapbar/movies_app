@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:movies_app/domain/entity/movie_details.dart';
 import 'package:movies_app/domain/entity/popular_movie_response.dart';
 
-enum ApiClientExceptionType { network, auth, other }
+enum ApiClientExceptionType { network, auth, other, sessionExpired }
 
 enum MediaType { movie, tv }
 
@@ -99,7 +99,9 @@ class ApiClient {
       return result;
     } on SocketException {
       throw ApiClientException(ApiClientExceptionType.network);
-    } catch (error) {
+    } on ApiClientException {
+      rethrow;
+    } catch (e) {
       throw ApiClientException(ApiClientExceptionType.other);
     }
   }
@@ -298,6 +300,8 @@ class ApiClient {
       final code = status is int ? status : 0;
       if (code == 30) {
         throw ApiClientException(ApiClientExceptionType.auth);
+      } else if (code == 3) {
+        throw ApiClientException(ApiClientExceptionType.sessionExpired);
       } else {
         throw ApiClientException(ApiClientExceptionType.other);
       }
