@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:movies_app/library/widgets/inherited/provider.dart';
 import 'package:movies_app/theme/app_colors.dart';
 import 'package:movies_app/ui/navigation/main_navigation.dart';
-import 'package:movies_app/ui/widgets/app/my_app_model.dart';
 
 class MyApp extends StatelessWidget {
   static final mainNavigation = MainNavigation();
@@ -11,7 +9,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = Provider.read<MyAppModel>(context);
     return MaterialApp(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
@@ -26,7 +23,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       routes: mainNavigation.routes,
-      initialRoute: mainNavigation.initialRoute(model?.isAuth == true),
+      initialRoute: MainNavigationRouteName.loaderWidget,
       onGenerateRoute: mainNavigation.onGenerateRoute,
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
