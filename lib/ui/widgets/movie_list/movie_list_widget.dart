@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:movies_app/domain/api_client/api_client.dart';
+import 'package:movies_app/domain/api_client/image_downloader.dart';
 import 'package:movies_app/library/widgets/inherited/provider.dart';
 import 'package:movies_app/ui/widgets/movie_list/movie_list_model.dart';
 
@@ -42,7 +42,7 @@ class MovieListWidget extends StatelessWidget {
                     child: Row(
                       children: [
                         posterPath != null
-                            ? Image.network(ApiClient.imageUrl(posterPath),
+                            ? Image.network(ImageDownloader.imageUrl(posterPath),
                                 width: 95)
                             : const SizedBox.shrink(),
                         const SizedBox(width: 15),

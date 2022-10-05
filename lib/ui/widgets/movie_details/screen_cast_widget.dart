@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:movies_app/domain/api_client/api_client.dart';
+import 'package:movies_app/domain/api_client/image_downloader.dart';
 import 'package:movies_app/library/widgets/inherited/provider.dart';
 import 'package:movies_app/ui/widgets/movie_details/movie_details_model.dart';
 
@@ -95,7 +95,7 @@ class ActorListItem extends StatelessWidget {
           child: Column(
             children: [
               profilePath != null
-                  ? Image.network(ApiClient.imageUrl(profilePath))
+                  ? Image.network(ImageDownloader.imageUrl(profilePath))
                   : const SizedBox.shrink(),
               Padding(
                 padding: const EdgeInsets.all(8.0),
