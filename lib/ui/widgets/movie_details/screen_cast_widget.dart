@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:movies_app/domain/api_client/image_downloader.dart';
-import 'package:movies_app/library/widgets/inherited/provider.dart';
 import 'package:movies_app/ui/widgets/movie_details/movie_details_model.dart';
+import 'package:provider/provider.dart';
 
 class ScreenCastWidget extends StatelessWidget {
   const ScreenCastWidget({super.key});
@@ -49,9 +49,8 @@ class ActorsListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = NotifierProvider.watch<MovieDetailsModel>(context);
-    var cast = model?.movieDetails?.credits.cast;
-    if (cast == null || cast.isEmpty) return const SizedBox.shrink();
+    var cast = context.select((MovieDetailsModel model) => model.data.cast);
+    if (cast.isEmpty) return const SizedBox.shrink();
     return ListView.builder(
       itemCount: cast.length,
       itemExtent: 140,
@@ -69,8 +68,8 @@ class ActorListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = NotifierProvider.read<MovieDetailsModel>(context);
-    final actor = model!.movieDetails!.credits.cast[index];
+    final cast = context.read<MovieDetailsModel>().data.cast;
+    final actor = cast[index];
     final profilePath = actor.profilePath;
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -94,9 +93,8 @@ class ActorListItem extends StatelessWidget {
           clipBehavior: Clip.hardEdge,
           child: Column(
             children: [
-              profilePath != null
-                  ? Image.network(ImageDownloader.imageUrl(profilePath))
-                  : const SizedBox.shrink(),
+              if (profilePath != null)
+                Image.network(ImageDownloader.imageUrl(profilePath)),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(

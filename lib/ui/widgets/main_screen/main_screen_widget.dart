@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:movies_app/domain/data_providers/session_data_providers.dart';
 import 'package:movies_app/domain/factoryes/screen_factory.dart';
 
 class MainScreenWidget extends StatefulWidget {
@@ -28,7 +27,7 @@ class _MainScreenWidgetState extends State<MainScreenWidget> {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: () => SessionDataProvider().setSessionId(null),
+            onPressed: () {},
             icon: const Icon(Icons.logout),
           ),
         ],

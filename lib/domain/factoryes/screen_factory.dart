@@ -8,8 +8,6 @@ import 'package:movies_app/ui/widgets/movie_list/movie_list_widget.dart';
 import 'package:movies_app/ui/widgets/news/news_screen.dart';
 import 'package:movies_app/ui/widgets/tv_show/tv_show_screen.dart';
 import 'package:provider/provider.dart';
-import 'package:movies_app/library/widgets/inherited/provider.dart'
-    as old_provider;
 import 'package:movies_app/ui/widgets/auth/auth_model.dart';
 import 'package:movies_app/ui/widgets/auth/auth_widget.dart';
 import 'package:movies_app/ui/widgets/loader_widget/loader_view_model.dart';
@@ -36,8 +34,8 @@ class ScreenFactory {
   }
 
   Widget makeMovieDetails(int movieId) {
-    return old_provider.NotifierProvider(
-      create: () => MovieDetailsModel(movieId),
+    return ChangeNotifierProvider(
+      create: (_) => MovieDetailsModel(movieId),
       child: const MovieDetailsWidget(),
     );
   }
