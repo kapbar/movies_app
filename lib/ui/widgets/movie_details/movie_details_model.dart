@@ -15,13 +15,27 @@ import '../../../domain/entity/movie_details_casts.dart';
 class MovieDetailsPosterData {
   final String? backdropPath;
   final String? posterPath;
-  final IconData favoriteIcon;
+  final bool isFavorite;
+  IconData get favoriteIcon =>
+      isFavorite ? Icons.favorite : Icons.favorite_outline_outlined;
 
   MovieDetailsPosterData({
     this.backdropPath,
     this.posterPath,
-    this.favoriteIcon = Icons.favorite_outline_outlined,
+    this.isFavorite = false,
   });
+
+  MovieDetailsPosterData copyWith({
+    String? backdropPath,
+    String? posterPath,
+    bool? isFavorite,
+  }) {
+    return MovieDetailsPosterData(
+      backdropPath: backdropPath ?? this.backdropPath,
+      posterPath: posterPath ?? this.posterPath,
+      isFavorite: isFavorite ?? this.isFavorite,
+    );
+  }
 }
 
 class MovieDetailsScoreData {
@@ -65,9 +79,7 @@ class MovieDetailsModel extends ChangeNotifier {
   final data = MovieDetailsData();
   final int movieId;
   String _locale = '';
-  MovieDetails? _movieDetails;
   late DateFormat _dateFormat;
-  bool _isFavorite = false;
 
   MovieDetailsModel(this.movieId);
 
@@ -78,13 +90,11 @@ class MovieDetailsModel extends ChangeNotifier {
       notifyListeners();
       return;
     }
-    final iconData =
-        isFavorite ? Icons.favorite : Icons.favorite_outline_outlined;
     data.overview = details.overview ?? '';
     data.posterData = MovieDetailsPosterData(
       backdropPath: details.backdropPath,
       posterPath: details.posterPath,
-      favoriteIcon: iconData,
+      isFavorite: isFavorite,
     );
     var year = details.releaseDate?.year.toString();
     year = year != null ? ' ($year)' : '';
@@ -141,12 +151,6 @@ class MovieDetailsModel extends ChangeNotifier {
     return text.join(' ');
   }
 
-  MovieDetails? get movieDetails => _movieDetails;
-  bool get isFavorite => _isFavorite;
-
-  String stringFromDate(DateTime? date) =>
-      date != null ? _dateFormat.format(date) : '';
-
   Future<void> setupLocale(BuildContext context) async {
     final locale = Localizations.localeOf(context).toLanguageTag();
     if (_locale == locale) return;
@@ -161,12 +165,14 @@ class MovieDetailsModel extends ChangeNotifier {
     bool mounted = true,
   ]) async {
     try {
-      _movieDetails = await _movietApiClient.movieDetails(movieId, _locale);
+      final movieDetails =
+          await _movietApiClient.movieDetails(movieId, _locale);
       final sessionId = await _sessionDataProvider.getSessionId();
+      var isFavorite = false;
       if (sessionId != null) {
-        _isFavorite = await _movietApiClient.isFavorite(movieId, sessionId);
+        isFavorite = await _movietApiClient.isFavorite(movieId, sessionId);
       }
-      updateData(_movieDetails, _isFavorite);
+      updateData(movieDetails, isFavorite);
     } on ApiClientException catch (e) {
       switch (e.type) {
         case ApiClientExceptionType.sessionExpired:
@@ -188,7 +194,8 @@ class MovieDetailsModel extends ChangeNotifier {
     final accountId = await _sessionDataProvider.getAccountId();
     if (sessionId == null || accountId == null) return;
 
-    _isFavorite = !_isFavorite;
+    data.posterData =
+        data.posterData.copyWith(isFavorite: !data.posterData.isFavorite);
     notifyListeners();
     try {
       await _accountApiClient.markAsFavorite(
@@ -196,7 +203,7 @@ class MovieDetailsModel extends ChangeNotifier {
         sessionId: sessionId,
         mediaType: MediaType.movie,
         mediaId: movieId,
-        isFavorite: _isFavorite,
+        isFavorite: data.posterData.isFavorite,
       );
     } on ApiClientException catch (e) {
       switch (e.type) {

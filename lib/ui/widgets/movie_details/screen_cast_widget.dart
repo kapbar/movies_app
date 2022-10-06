@@ -68,8 +68,7 @@ class ActorListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cast = context.read<MovieDetailsModel>().data.cast;
-    final actor = cast[index];
+    final actor = context.read<MovieDetailsModel>().data.cast[index];
     final profilePath = actor.profilePath;
     return Padding(
       padding: const EdgeInsets.all(8.0),
