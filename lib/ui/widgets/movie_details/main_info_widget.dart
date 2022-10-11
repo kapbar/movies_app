@@ -151,7 +151,7 @@ class ScoreWidget extends StatelessWidget {
                   freeColor: const Color.fromARGB(255, 25, 54, 31),
                   lineWidth: 3.5,
                   child: Text(
-                    '${scoreData.voteAverage * 10}%',
+                    '${(scoreData.voteAverage * 10).toStringAsFixed(0)}%',
                     style: const TextStyle(color: Colors.white, fontSize: 13),
                   ),
                 ),
