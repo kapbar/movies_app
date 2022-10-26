@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:movies_app/domain/factoryes/screen_factory.dart';
+import 'package:movies_app/domain/services/auth_service.dart';
 
 class MainScreenWidget extends StatefulWidget {
   const MainScreenWidget({super.key});
@@ -27,7 +28,9 @@ class _MainScreenWidgetState extends State<MainScreenWidget> {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              AuthService().logout();
+            },
             icon: const Icon(Icons.logout),
           ),
         ],

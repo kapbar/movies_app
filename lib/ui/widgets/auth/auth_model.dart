@@ -1,7 +1,41 @@
+import 'dart:async';
+
+import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:movies_app/domain/api_client/api_client_exception.dart';
+import 'package:movies_app/domain/blocs/auth_bloc.dart';
 import 'package:movies_app/domain/services/auth_service.dart';
 import 'package:movies_app/ui/navigation/main_navigation.dart';
+
+class AuthViewCubitState {
+  final String? errorMessage;
+  final bool _isAuthProgress;
+
+  AuthViewCubitState(
+    this.errorMessage,
+    this._isAuthProgress,
+  );
+  bool get canStartAuth => !_isAuthProgress;
+  bool get isAuthProgress => _isAuthProgress;
+}
+
+class AuthViewCubit extends Cubit<AuthViewCubitState> {
+  final AuthBloc authBloc;
+  late final StreamSubscription<AuthState> authBlocSubscription;
+  AuthViewCubit(super.initialState, this.authBloc) {}
+
+  bool _isValid(String login, String password) =>
+      login.isNotEmpty && password.isNotEmpty;
+
+  void auth({required String login, required String password}) {
+    if (!_isValid(login, password)) {
+      final state = AuthViewCubitState('Заполниет логин и пароль', false);
+      emit(state);
+      return;
+    }
+    emit(AuthViewCubitState(null, true));
+  }
+}
 
 class AuthViewModel extends ChangeNotifier {
   final _authService = AuthService();

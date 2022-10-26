@@ -12,7 +12,7 @@ import 'package:movies_app/ui/widgets/tv_show/tv_show_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:movies_app/ui/widgets/auth/auth_model.dart';
 import 'package:movies_app/ui/widgets/auth/auth_widget.dart';
-import 'package:movies_app/ui/widgets/loader_widget/loader_view_model.dart';
+import 'package:movies_app/ui/widgets/loader_widget/loader_view_cubit.dart';
 import 'package:movies_app/ui/widgets/loader_widget/loader_widget.dart';
 
 class ScreenFactory {
