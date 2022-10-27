@@ -2,38 +2,91 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
+
 import 'package:movies_app/domain/api_client/api_client_exception.dart';
 import 'package:movies_app/domain/blocs/auth_bloc.dart';
 import 'package:movies_app/domain/services/auth_service.dart';
 import 'package:movies_app/ui/navigation/main_navigation.dart';
 
-class AuthViewCubitState {
-  final String? errorMessage;
-  final bool _isAuthProgress;
+abstract class AuthViewCubitState {}
 
-  AuthViewCubitState(
-    this.errorMessage,
-    this._isAuthProgress,
-  );
-  bool get canStartAuth => !_isAuthProgress;
-  bool get isAuthProgress => _isAuthProgress;
+class AuthViewCubitSuccesFormFillInProgressState extends AuthViewCubitState {
+  @override
+  bool operator ==(Object other) =>
+      other is AuthViewCubitSuccesFormFillInProgressState &&
+      runtimeType == other.runtimeType;
+
+  @override
+  int get hashCode => 0;
+}
+
+class AuthViewCubitErrorState extends AuthViewCubitState {
+  final String errorMessage;
+
+  AuthViewCubitErrorState(this.errorMessage);
+
+  @override
+  bool operator ==(covariant AuthViewCubitErrorState other) {
+    if (identical(this, other)) return true;
+
+    return other.errorMessage == errorMessage;
+  }
+
+  @override
+  int get hashCode => errorMessage.hashCode;
+}
+
+class AuthViewCubitAuthProgressState extends AuthViewCubitState {
+  @override
+  bool operator ==(Object other) =>
+      other is AuthViewCubitAuthProgressState &&
+      runtimeType == other.runtimeType;
+
+  @override
+  int get hashCode => 0;
+}
+
+class AuthViewCubitSuccesAuthState extends AuthViewCubitState {
+  @override
+  bool operator ==(Object other) =>
+      other is AuthViewCubitSuccesAuthState && runtimeType == other.runtimeType;
+
+  @override
+  int get hashCode => 0;
 }
 
 class AuthViewCubit extends Cubit<AuthViewCubitState> {
   final AuthBloc authBloc;
   late final StreamSubscription<AuthState> authBlocSubscription;
-  AuthViewCubit(super.initialState, this.authBloc) {}
+  AuthViewCubit(super.initialState, this.authBloc);
 
   bool _isValid(String login, String password) =>
       login.isNotEmpty && password.isNotEmpty;
 
   void auth({required String login, required String password}) {
     if (!_isValid(login, password)) {
-      final state = AuthViewCubitState('Заполниет логин и пароль', false);
+      final state = AuthViewCubitErrorState('Заполниет логин и пароль');
       emit(state);
       return;
     }
-    emit(AuthViewCubitState(null, true));
+    authBloc.add(AuthLogintEvent(login: login, password: password));
+  }
+
+  void _onState(AuthState state) {
+    if (state is AuthUnAuthorizedState) {
+      emit(AuthViewCubitSuccesFormFillInProgressState());
+    } else if (state is AuthAuthorizedState) {
+      emit(AuthViewCubitSuccesAuthState());
+    } else if (state is AuthFailureState) {
+      final state = AuthViewCubitErrorState('Заполниет логин и пароль');
+      emit(state);
+    }
+  }
+
+  @override
+  Future<void> close() {
+    authBlocSubscription.cancel();
+    return super.close();
   }
 }
 
